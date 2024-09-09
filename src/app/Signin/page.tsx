@@ -2,10 +2,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { setUsername } from "../../redux/slices/usernameSlice";
-import { setUserid } from "../../redux/slices/useridSlice";
+// import { setUsername } from "../../redux/slices/usernameSlice";
+// import { setUserid } from "../../redux/slices/useridSlice";
 
-import { fetchData } from "../../redux/slices/dataSlice";
+// import { fetchData } from "../../redux/slices/dataSlice";
 
 import { useRouter } from "next/navigation";
 
@@ -16,7 +16,7 @@ const Signin = () => {
   const [password, setPassword] = useState<string>("");
   const [message, setMessage] = useState<string>("");
   const router = useRouter();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -30,8 +30,8 @@ const Signin = () => {
       );
 
       console.log(response);
-      dispatch(setUsername(response.data.user.name));
-      dispatch(setUserid(response.data.user.id));
+      // dispatch(setUsername(response.data.user.name));
+      // dispatch(setUserid(response.data.user.id));
       // dispatch(fetchData(response.data.user.id));
 
       Cookies.set("token", response.data.token, {

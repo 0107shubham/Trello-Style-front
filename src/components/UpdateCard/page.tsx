@@ -24,7 +24,7 @@ interface SelectedOption {
   title: string;
   categoryId: string;
   priority: string;
-  deadline: Date;
+  deadline: Date | null;
   description: string;
   status: string;
 }
@@ -94,6 +94,11 @@ const UpdateCard: React.FC<FormProps> = ({ toggleDrawer, component }) => {
   };
 
   const isWeekday = (date: Date | null) => {
+    if (!date) {
+      // If the date is null, you can return false or handle it as needed
+      return false;
+    }
+
     const day = getDay(date);
     return day !== 0 && day !== 6; // Exclude Sundays (0) and Saturdays (6)
   };
@@ -103,11 +108,14 @@ const UpdateCard: React.FC<FormProps> = ({ toggleDrawer, component }) => {
     setIsOpen(!isOpen);
   };
 
-  const handleDateChange = (date: Date) => {
-    setSelectedOption((prevState) => ({
-      ...prevState,
-      deadline: date,
-    }));
+  const handleDateChange = (date: Date | null) => {
+    if (date) {
+      // Handle the case when a valid date is selected
+      setSelectedOption((prev) => ({ ...prev, deadline: date }));
+    } else {
+      // Handle the case when no date is selected (null)
+      setSelectedOption((prev) => ({ ...prev, deadline: null }));
+    }
   };
 
   const handleChange = (
@@ -451,7 +459,7 @@ const UpdateCard: React.FC<FormProps> = ({ toggleDrawer, component }) => {
             </svg>
 
             <DatePicker
-              selected={selectedOption.deadline}
+              selected={selectedOption.deadline ?? undefined} // Handle null case with undefined
               onChange={(date: Date | null) => handleDateChange(date)}
               filterDate={isWeekday}
               placeholderText="Select a weekday"

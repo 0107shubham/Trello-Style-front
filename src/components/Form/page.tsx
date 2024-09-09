@@ -28,33 +28,35 @@ interface SelectedOption {
 }
 
 const Form: React.FC<FormProps> = ({ toggleDrawer }) => {
-  const { data, loading, error, setData, setLoading, setError } =
-    useDataContext();
+  const { data, setData } = useDataContext();
   const [isOpen, setIsOpen] = useState(true);
   const [selectedOptionCategory, setSelectedOptionCategory] =
-    useState<string>("Not selected");
-
+    useState<string>("");
   const [priority, setPriority] = useState<string>("");
 
   const [selectedOption, setSelectedOption] = useState<SelectedOption>({
     title: "",
-
+    categoryId: "", // Initialize categoryId
+    priority: "", // Initialize priority
     deadline: null,
     description: "",
-    status: "staus",
+    status: "", // Initialize status
   });
+
   const handleSelect = (value: string) => {
     setSelectedOptionCategory(value);
   };
+
   const handlePriorityChange = (value: string) => {
     setPriority(value);
   };
 
   console.log("form data", selectedOptionCategory);
+
   useEffect(() => {
     console.log("Data updated:", data);
-    console.log("logoon i ma");
   }, [data]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -83,9 +85,9 @@ const Form: React.FC<FormProps> = ({ toggleDrawer }) => {
             : category
         )
       );
-      console.log("Response: from creting post", response.data, data);
+      console.log("Response: from creating post", response.data);
     } catch (error) {
-      console.error("Error posting data: creatinf post", error);
+      console.error("Error posting data: creating post", error);
     }
   };
 
@@ -100,26 +102,23 @@ const Form: React.FC<FormProps> = ({ toggleDrawer }) => {
   };
 
   const handleDateChange = (date: Date | null) => {
-    const dateObject = new Date(date);
-
-    // Convert the Date object to ISO-8601 format
-    const isoDateString = dateObject.toISOString();
-    // Convert the date string to a Date object
-    +setSelectedOption((prevState: Date) => ({
+    setSelectedOption((prevState) => ({
       ...prevState,
-      deadline: isoDateString,
+      deadline: date,
     }));
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ): void => {
-    setSelectedOption({
-      ...selectedOption,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setSelectedOption((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
-
   return (
     <div>
       <div
@@ -328,7 +327,6 @@ const Form: React.FC<FormProps> = ({ toggleDrawer }) => {
               value={selectedOptionCategory}
               onValueChange={handleSelect}
               name="categoryId"
-              className="border-[4px]"
             >
               <SelectTrigger className="w-[180px] h-[24px] text-gray-600 text-sm">
                 <SelectValue placeholder="Select an option" />

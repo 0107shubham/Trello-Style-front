@@ -15,7 +15,7 @@ const Sidebar = () => {
   const toggleDrawer = () => setIsOpen(!isOpen);
 
   useEffect(() => {
-    const userName = Cookies.get("userName");
+    const userName = Cookies.get("userName") || "";
     setName(userName);
   }, []);
 

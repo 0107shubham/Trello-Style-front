@@ -16,13 +16,15 @@ import {
 
 interface FormProps {
   toggleDrawer: () => void;
+  component: SelectedOption; // Include component as a prop with the right type
 }
 
 interface SelectedOption {
+  id: string;
   title: string;
   categoryId: string;
   priority: string;
-  deadline: Date | null;
+  deadline: Date;
   description: string;
   status: string;
 }
@@ -30,24 +32,25 @@ interface SelectedOption {
 const UpdateCard: React.FC<FormProps> = ({ toggleDrawer, component }) => {
   const { id, title, description, status, priority, deadline, categoryId } =
     component;
-  const { data, loading, error, setData, setLoading, setError } =
-    useDataContext();
+  const { setData } = useDataContext();
   const [isOpen, setIsOpen] = useState(true);
   const [selectedOptionCategory, setSelectedOptionCategory] =
     useState<string>(categoryId);
-
   const [priorityUpdate, setPriorityUpdate] = useState<string>(priority);
-
   const [selectedOption, setSelectedOption] = useState<SelectedOption>({
-    title: title,
-
-    deadline: deadline,
-    description: description,
-    status: "staus",
+    id,
+    title,
+    categoryId,
+    priority,
+    deadline,
+    description,
+    status,
   });
+
   const handleSelect = (value: string) => {
     setSelectedOptionCategory(value);
   };
+
   const handlePriorityChange = (value: string) => {
     setPriorityUpdate(value);
   };
@@ -56,7 +59,7 @@ const UpdateCard: React.FC<FormProps> = ({ toggleDrawer, component }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("submit fro create form");
+    console.log("submit for create form");
     const { title, description, deadline, status } = selectedOption;
 
     try {
@@ -78,7 +81,7 @@ const UpdateCard: React.FC<FormProps> = ({ toggleDrawer, component }) => {
           category.id === updatedData.categoryId
             ? {
                 ...category,
-                posts: category.posts.map((post) =>
+                posts: category.posts.map((post: any) =>
                   post.id === updatedData.id ? updatedData : post
                 ),
               }
@@ -86,11 +89,11 @@ const UpdateCard: React.FC<FormProps> = ({ toggleDrawer, component }) => {
         )
       );
     } catch (error) {
-      console.error("Error posting data: creatinf post", error);
+      console.error("Error posting data: creating post", error);
     }
   };
 
-  const isWeekday = (date: Date) => {
+  const isWeekday = (date: Date | null) => {
     const day = getDay(date);
     return day !== 0 && day !== 6; // Exclude Sundays (0) and Saturdays (6)
   };
@@ -100,20 +103,17 @@ const UpdateCard: React.FC<FormProps> = ({ toggleDrawer, component }) => {
     setIsOpen(!isOpen);
   };
 
-  const handleDateChange = (date: Date | null) => {
-    const dateObject = new Date(date);
-
-    // Convert the Date object to ISO-8601 format
-    const isoDateString = dateObject.toISOString();
-    // Convert the date string to a Date object
-    +setSelectedOption((prevState: Date) => ({
+  const handleDateChange = (date: Date) => {
+    setSelectedOption((prevState) => ({
       ...prevState,
-      deadline: isoDateString,
+      deadline: date,
     }));
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ): void => {
     setSelectedOption({
       ...selectedOption,
@@ -329,7 +329,6 @@ const UpdateCard: React.FC<FormProps> = ({ toggleDrawer, component }) => {
               value={selectedOptionCategory}
               onValueChange={handleSelect}
               name="categoryId"
-              className="border-[4px]"
             >
               <SelectTrigger className="w-[180px] h-[24px] text-gray-600 text-sm">
                 <SelectValue placeholder="Select an option" />
@@ -453,7 +452,7 @@ const UpdateCard: React.FC<FormProps> = ({ toggleDrawer, component }) => {
 
             <DatePicker
               selected={selectedOption.deadline}
-              onChange={handleDateChange}
+              onChange={(date: Date | null) => handleDateChange(date)}
               filterDate={isWeekday}
               placeholderText="Select a weekday"
               className="w-[200px] h-[40px]  text-gray-600 text-sm rounded outline-none"
